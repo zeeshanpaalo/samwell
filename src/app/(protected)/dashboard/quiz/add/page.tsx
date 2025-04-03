@@ -1,8 +1,13 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 
 const StartQuiz: React.FC = () => {
+  const router = useRouter();
+  const handleSubmit = () => {
+    router.push("/dashboard/quiz/1");
+  };
   return (
     <div className="flex flex-col w-full px-[16px] py-[16px] min-h-screen">
       <div className="flex justify-between items-center">
@@ -16,7 +21,7 @@ const StartQuiz: React.FC = () => {
 
       {/* Question List */}
       <div className="px-[16px] py-[32px]">
-        {[...Array(6)].map((_, index) => (
+        {[...Array(10)].map((_, index) => (
           <div key={index} className="bg-white p-6 rounded-lg shadow mb-6">
             <p className="font-medium mb-4">Question {index + 1} of 10</p>
             <h2 className="text-lg font-semibold mb-4">
@@ -65,7 +70,10 @@ const StartQuiz: React.FC = () => {
 
       {/* Submit Button */}
       <div className="flex justify-end px-[16px] py-4">
-        <button className="bg-[#2A76F6] text-white px-6 py-2 rounded-[59px] shadow hover:bg-blue-700 w-[174px] h-[50px]">
+        <button
+          className="bg-[#2A76F6] text-white px-6 py-2 rounded-[59px] shadow hover:bg-blue-700 w-[174px] h-[50px]"
+          onClick={handleSubmit}
+        >
           Complete
         </button>
       </div>

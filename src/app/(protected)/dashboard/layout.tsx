@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Layout({
   children,
@@ -8,29 +9,34 @@ export default function Layout({
     <div className="flex h-screen">
       {/* Sidebar */}
       <aside className="w-[80px] bg-white shadow-md p-4">
-        <Image src={"/assets/Logo.svg"} alt={`Logo`} width={32} height={32} />
+        <Link href="/" className="block p-2 rounded hover:bg-gray-200">
+          <Image src={"/assets/Logo.svg"} alt={`Logo`} width={32} height={32} />
+        </Link>
         <br />
         <nav className="mt-4">
           <ul className="space-y-2">
             <li>
-              <a href="#" className="block p-2 rounded hover:bg-gray-200">
+              <Link
+                href="/dashboard/quiz"
+                className="block p-2 rounded hover:bg-gray-200"
+              >
                 <Image
                   src={"/assets/quizIcon.svg"}
-                  alt={`Logo`}
+                  alt={`Quiz Icon`}
                   width={24}
                   height={24}
                 />
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="block p-2 rounded hover:bg-gray-200">
+              <Link href="#" className="block p-2 rounded hover:bg-gray-200">
                 <Image
                   src={"/assets/otherIcon.svg"}
                   alt={`Logo`}
                   width={24}
                   height={24}
                 />
-              </a>
+              </Link>
             </li>
           </ul>
         </nav>
