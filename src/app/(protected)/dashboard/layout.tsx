@@ -5,7 +5,7 @@ export default function Layout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen">
       {/* Sidebar */}
       <aside className="w-[80px] bg-white shadow-md p-4">
         <Image src={"/assets/Logo.svg"} alt={`Logo`} width={32} height={32} />
@@ -37,9 +37,9 @@ export default function Layout({
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col bg-[#F9F9F9]">
         {/* Header */}
-        <header className="h-[100px] bg-white shadow p-4 flex justify-between items-center">
+        <header className="h-[100px] bg-[#F9F9F9] shadow p-4 flex justify-between items-center">
           <div className="flex items-center">
             <Image
               src={"/assets/quizHeaderIcon.svg"}
@@ -52,7 +52,6 @@ export default function Layout({
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            {/* <span className="text-gray-600">Time left: 00:18:54</span> */}
             <Image
               src={"/assets/avatar.svg"}
               alt={`Logo`}
@@ -63,7 +62,7 @@ export default function Layout({
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 p-6 overflow-y-auto">{children}</main>
+        <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>
   );

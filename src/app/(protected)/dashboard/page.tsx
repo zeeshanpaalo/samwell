@@ -3,7 +3,7 @@ import React from "react";
 
 const DashboardHome: React.FC = () => {
   return (
-    <div>Dashboard Home</div>
+    <div>This is the Dashboar home. Not relevant inthis task</div>
   );
 };
 
