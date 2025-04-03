@@ -1,4 +1,10 @@
 import React, { useState } from "react";
+import {
+  DndContext,
+  useDraggable,
+  useDroppable,
+  DragEndEvent,
+} from "@dnd-kit/core";
 
 const QUESTION_TYPES = {
   SINGLE_CHOICE: "SINGLE_CHOICE",
@@ -11,19 +17,57 @@ const QUESTION_TYPES = {
 type Question = {
   type: string;
   text: string;
-  options: string[];
-  pairs: string[];
 };
 
+// Single choice question type or True false
+interface SingleChoiceQuestion extends Question {
+  options: string[];
+  //   correctAnswer: string;
+}
+
+// Multiple choice question type
+interface MultipleChoiceQuestion extends Question {
+  options: string[];
+  correctAnswer: string[]; // can be multiple
+}
+
+// Matching question type
+interface MatchingQuestion extends Question {
+  definitions: string[];
+  terms: string[];
+  //   correctPairs: { [key: string]: string };
+}
+
+// Fill in the blank question type
+interface FillInTheBlankQuestion extends Question {
+  options: string[];
+  //   correctAnswer: string;
+}
+
+// Short answer question type
+interface ShortAnswerQuestion extends Question {
+  //   correctAnswer: string;
+}
+
+// Union type to represent all possible questions
+type AnyQuestion =
+  | SingleChoiceQuestion
+  | MultipleChoiceQuestion
+  | MatchingQuestion
+  | FillInTheBlankQuestion
+  | ShortAnswerQuestion;
+
 interface QuestionProps {
-  question: Question;
+  question: AnyQuestion;
 }
 
 interface QuizQuestionsListProps {
-  questions: Question[];
+  questions: AnyQuestion[];
 }
 
-const SingleChoiceQuestion: React.FC<QuestionProps> = ({ question }) => {
+const SingleChoiceQuestionComp: React.FC<{
+  question: SingleChoiceQuestion;
+}> = ({ question }) => {
   const [selected, setSelected] = useState<number | null>(null);
 
   return (
@@ -68,7 +112,9 @@ const SingleChoiceQuestion: React.FC<QuestionProps> = ({ question }) => {
   );
 };
 
-const MultipleAnswerQuestion: React.FC<QuestionProps> = ({ question }) => (
+const MultipleAnswerQuestionComp: React.FC<{
+  question: MultipleChoiceQuestion;
+}> = ({ question }) => (
   <div className="p-6 rounded-lg bg-white shadow-sm">
     <p className="font-semibold text-lg">{question.text}</p>
     <div className="grid grid-cols-2 gap-4 mt-4">
@@ -85,7 +131,9 @@ const MultipleAnswerQuestion: React.FC<QuestionProps> = ({ question }) => (
   </div>
 );
 
-const FillBlankQuestion: React.FC<QuestionProps> = ({ question }) => (
+const FillBlankQuestionComp: React.FC<{ question: FillInTheBlankQuestion }> = ({
+  question,
+}) => (
   <div className="p-6 rounded-lg bg-white shadow-sm">
     <p className="font-semibold text-lg">{question.text}</p>
     <div className="grid grid-cols-2 gap-4 mt-4">
@@ -102,7 +150,9 @@ const FillBlankQuestion: React.FC<QuestionProps> = ({ question }) => (
   </div>
 );
 
-const TextResponseQuestion: React.FC<QuestionProps> = ({ question }) => (
+const TextResponseQuestionComp: React.FC<{ question: ShortAnswerQuestion }> = ({
+  question,
+}) => (
   <div className="p-6 rounded-lg bg-white shadow-sm">
     <p className="font-semibold text-lg">{question.text}</p>
     <textarea
@@ -113,38 +163,133 @@ const TextResponseQuestion: React.FC<QuestionProps> = ({ question }) => (
   </div>
 );
 
-const MatchingQuestion: React.FC<QuestionProps> = ({ question }) => (
-  <div className="p-6 rounded-lg bg-white shadow-sm">
-    <p className="font-semibold text-lg">{question.text}</p>
-    <div className="mt-4 space-y-2">
-      {question.pairs.map((pair, index) => (
-        <div
-          key={index}
-          className="flex justify-between items-center p-4 border rounded-lg"
-        >
-          <span>{pair}</span>
-          <button className="px-4 py-2 border rounded-lg bg-white">
-            Select from list
-          </button>
-        </div>
-      ))}
-    </div>
-  </div>
-);
+const DraggableTerm: React.FC<{ id: string; children: React.ReactNode }> = ({
+  id,
+  children,
+}) => {
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({ id });
 
-const QuestionRenderer: React.FC<QuestionProps> = ({ question }) => {
-  const components = {
-    [QUESTION_TYPES.SINGLE_CHOICE]: SingleChoiceQuestion,
-    [QUESTION_TYPES.MULTIPLE_ANSWER]: MultipleAnswerQuestion,
-    [QUESTION_TYPES.FILL_BLANK]: FillBlankQuestion,
-    [QUESTION_TYPES.TEXT_RESPONSE]: TextResponseQuestion,
-    [QUESTION_TYPES.MATCHING]: MatchingQuestion,
+  return (
+    <div
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      className="px-4 py-2 border rounded-lg bg-gray-100 cursor-pointer"
+      style={{
+        transform: transform
+          ? `translate(${transform.x}px, ${transform.y}px)`
+          : undefined,
+      }}
+    >
+      {children}
+    </div>
+  );
+};
+
+const DroppableArea: React.FC<{ id: string; selectedTerm?: string }> = ({
+  id,
+  selectedTerm,
+}) => {
+  const { setNodeRef } = useDroppable({ id });
+
+  return (
+    <div
+      ref={setNodeRef}
+      className="px-4 py-2 border-2 border-dashed rounded-lg w-48 text-center min-h-[40px] flex items-center justify-center"
+    >
+      {selectedTerm || "Select From list below"}
+    </div>
+  );
+};
+
+const MatchingQuestionComp: React.FC<{
+  question: MatchingQuestion;
+  onAnswerSubmit: (answers: { [key: string]: string }) => void;
+}> = ({ question, onAnswerSubmit }) => {
+  const [selectedAnswers, setSelectedAnswers] = useState<{
+    [key: string]: string;
+  }>({});
+  const [options, setOptions] = useState(question.terms);
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over) {
+      const draggedItem = String(active.id); // Convert to string
+      const dropTarget = String(over.id); // Convert to string
+
+      const newAnswers = { ...selectedAnswers, [dropTarget]: draggedItem };
+
+      setSelectedAnswers(newAnswers);
+      setOptions(options.filter((term) => term !== draggedItem));
+      onAnswerSubmit(newAnswers);
+    }
   };
 
-  const Component =
-    components[question.type] || (() => <div>Unsupported question type</div>);
+  return (
+    <div className="p-6 rounded-lg bg-white shadow-sm">
+      <p className="font-semibold text-lg">{question.text}</p>
 
-  return <Component question={question} />;
+      <DndContext onDragEnd={handleDragEnd}>
+        <div className="mt-4 space-y-4">
+          {question.definitions.map((definition, index) => (
+            <div
+              key={index}
+              className="flex justify-between items-center p-4 border rounded-lg"
+            >
+              <span>{definition}</span>
+              <DroppableArea
+                id={definition}
+                selectedTerm={selectedAnswers[definition]}
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-6 flex gap-2">
+          {options.map((term) => (
+            <DraggableTerm key={term} id={term}>
+              {term}
+            </DraggableTerm>
+          ))}
+        </div>
+      </DndContext>
+    </div>
+  );
+};
+
+const QuestionRenderer: React.FC<QuestionProps> = ({ question }) => {
+  if (question.type === QUESTION_TYPES.SINGLE_CHOICE) {
+    return (
+      <SingleChoiceQuestionComp question={question as SingleChoiceQuestion} />
+    );
+  }
+  if (question.type === QUESTION_TYPES.MULTIPLE_ANSWER) {
+    return (
+      <MultipleAnswerQuestionComp
+        question={question as MultipleChoiceQuestion}
+      />
+    );
+  }
+  if (question.type === QUESTION_TYPES.FILL_BLANK) {
+    return (
+      <FillBlankQuestionComp question={question as FillInTheBlankQuestion} />
+    );
+  }
+  if (question.type === QUESTION_TYPES.TEXT_RESPONSE) {
+    return (
+      <TextResponseQuestionComp question={question as ShortAnswerQuestion} />
+    );
+  }
+  if (question.type === QUESTION_TYPES.MATCHING) {
+    return (
+      <MatchingQuestionComp
+        question={question as MatchingQuestion}
+        onAnswerSubmit={() => {}}
+      />
+    );
+  }
+
+  return <div>Unsupported question type</div>;
 };
 
 const QuizQuestionsList: React.FC<QuizQuestionsListProps> = ({ questions }) => {

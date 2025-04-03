@@ -33,37 +33,37 @@ const StartQuiz: React.FC = () => {
                 "Mitochondria",
                 "Golgi Apparatus",
               ],
-              pairs: [],
+              // correctAnswer: ""
             },
             {
               type: "MULTIPLE_ANSWER",
               text: "Which of the following are primary colors? (Select all that apply.)",
               options: ["Red", "Blue", "Yellow", "Green"],
-              pairs: [],
+              // pairs: [],
             },
             {
               type: "SINGLE_CHOICE",
               text: "The Great Wall of China is visible from space.",
               options: ["True", "False"],
-              pairs: [],
+              // pairs: [],
             },
             {
               type: "MATCHING",
               text: "Click a definition to match it with a term.",
-              options: [],
-              pairs: ["COW", "FOX", "PIG", "DOG"],
+              definitions: ["dsfsdf", "dsfdf", "dfd", "dfd"],
+              terms: ["COW", "FOX", "PIG", "DOG"],
             },
             {
               type: "FILL_BLANK",
               text: "The main energy source for cells is  which moves through semi-permeable membranes by the process of ____________ and enzymes act as biological ____________ to speed up chemical reactions.",
               options: ["COW", "FOX", "PIG", "DOG"],
-              pairs: [],
+              // pairs: [],
             },
             {
               type: "TEXT_RESPONSE",
               text: "Whats your thought on String theory?",
               options: [],
-              pairs: [],
+              // pairs: [],
             },
            
           ]}
