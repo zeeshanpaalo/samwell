@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
+import QuizQuestionsList from "@/components/quiz";
 
 const StartQuiz: React.FC = () => {
   const router = useRouter();
@@ -21,51 +22,52 @@ const StartQuiz: React.FC = () => {
 
       {/* Question List */}
       <div className="px-[16px] py-[32px]">
-        {[...Array(10)].map((_, index) => (
-          <div key={index} className="bg-white p-6 rounded-lg shadow mb-6">
-            <p className="font-medium mb-4">Question {index + 1} of 10</p>
-            <h2 className="text-lg font-semibold mb-4">
-              Sample Question {index + 1}?
-            </h2>
-            <div className="space-y-2">
-              <label className="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-gray-50">
-                <input
-                  type="radio"
-                  name={`question${index}`}
-                  className="form-radio"
-                />
-                <span>Option A</span>
-              </label>
-              <label className="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-gray-50">
-                <input
-                  type="radio"
-                  name={`question${index}`}
-                  className="form-radio"
-                />
-                <span>Option B</span>
-              </label>
-              <label className="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-gray-50">
-                <input
-                  type="radio"
-                  name={`question${index}`}
-                  className="form-radio"
-                />
-                <span>Option C</span>
-              </label>
-              <label className="flex items-center space-x-2 p-2 border rounded cursor-pointer hover:bg-gray-50">
-                <input
-                  type="radio"
-                  name={`question${index}`}
-                  className="form-radio"
-                />
-                <span>Option D</span>
-              </label>
-            </div>
-            <a href="#" className="text-blue-600 text-sm mt-2 inline-block">
-              Don't know?
-            </a>
-          </div>
-        ))}
+        <QuizQuestionsList
+          questions={[
+            {
+              type: "SINGLE_CHOICE",
+              text: "What is the powerhouse of the cell?",
+              options: [
+                "Nucleus",
+                "Ribosome",
+                "Mitochondria",
+                "Golgi Apparatus",
+              ],
+              pairs: [],
+            },
+            {
+              type: "MULTIPLE_ANSWER",
+              text: "Which of the following are primary colors? (Select all that apply.)",
+              options: ["Red", "Blue", "Yellow", "Green"],
+              pairs: [],
+            },
+            {
+              type: "SINGLE_CHOICE",
+              text: "The Great Wall of China is visible from space.",
+              options: ["True", "False"],
+              pairs: [],
+            },
+            {
+              type: "MATCHING",
+              text: "Click a definition to match it with a term.",
+              options: [],
+              pairs: ["COW", "FOX", "PIG", "DOG"],
+            },
+            {
+              type: "FILL_BLANK",
+              text: "The main energy source for cells is  which moves through semi-permeable membranes by the process of ____________ and enzymes act as biological ____________ to speed up chemical reactions.",
+              options: ["COW", "FOX", "PIG", "DOG"],
+              pairs: [],
+            },
+            {
+              type: "TEXT_RESPONSE",
+              text: "Whats your thought on String theory?",
+              options: [],
+              pairs: [],
+            },
+           
+          ]}
+        />
       </div>
 
       {/* Submit Button */}
