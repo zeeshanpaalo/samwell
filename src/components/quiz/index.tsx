@@ -246,7 +246,11 @@ const DroppableArea: React.FC<{ id: string; selectedTerm?: string }> = ({
       ref={setNodeRef}
       className="px-4 py-2 border-2 border-dashed rounded-lg w-48 text-center min-h-[40px] flex items-center justify-center"
     >
-      {selectedTerm || "Select From list below"}
+      {selectedTerm ? (
+        <DraggableTerm id={selectedTerm}>{selectedTerm}</DraggableTerm>
+      ) : (
+        "Select From list below"
+      )}
     </div>
   );
 };
@@ -261,21 +265,28 @@ const MatchingQuestionComp: React.FC<{
   const [selectedAnswers, setSelectedAnswers] = useState<{
     [key: string]: string;
   }>({});
-  const [options, setOptions] = useState(question.terms);
+//   const [options, setOptions] = useState(question.terms);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    if (over) {
-      const draggedItem = String(active.id); // Convert to string
-      const dropTarget = String(over.id); // Convert to string
+    if (!over) return;
 
-      const newAnswers = { ...selectedAnswers, [dropTarget]: draggedItem };
+    const draggedItem = String(active.id);
+    const dropTarget = String(over.id);
 
-      setSelectedAnswers(newAnswers);
-      setOptions(options.filter((term) => term !== draggedItem));
-      onAnswerSubmit(question.id, newAnswers);
-      console.log(newAnswers);
-    }
+    // Remove dragged item from its previous definition (if any)
+    const updatedAnswers: { [key: string]: string } = {};
+    Object.entries(selectedAnswers).forEach(([def, term]) => {
+      if (term !== draggedItem) {
+        updatedAnswers[def] = term;
+      }
+    });
+
+    // Assign dragged item to new drop target
+    updatedAnswers[dropTarget] = draggedItem;
+
+    setSelectedAnswers(updatedAnswers);
+    onAnswerSubmit(question.id, updatedAnswers);
   };
 
   return (
@@ -298,12 +309,14 @@ const MatchingQuestionComp: React.FC<{
           ))}
         </div>
 
-        <div className="mt-6 flex gap-2">
-          {options.map((term) => (
-            <DraggableTerm key={term} id={term}>
-              {term}
-            </DraggableTerm>
-          ))}
+        <div className="mt-6 flex gap-2 flex-wrap">
+          {question.terms
+            .filter((term) => !Object.values(selectedAnswers).includes(term))
+            .map((term) => (
+              <DraggableTerm key={term} id={term}>
+                {term}
+              </DraggableTerm>
+            ))}
         </div>
       </DndContext>
     </div>

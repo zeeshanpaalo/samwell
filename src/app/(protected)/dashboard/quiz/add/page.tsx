@@ -75,8 +75,8 @@ const StartQuiz: React.FC = () => {
               id: "4",
               type: "MATCHING",
               text: "Click a definition to match it with a term.",
-              definitions: ["dsfsdf", "dsfdf", "dfd", "dfffd"],
-              terms: ["COW", "FOX", "PIG", "DOG"],
+              definitions: ["Process by which plants make their food.", "Type of cellular division.", "Movement of water across a membrane.", "Protein that speeds up chemical reactions."],
+              terms: ["Photosynthesis", "Mitosis", "Osmosis", "Enzyme"],
             },
             {
               id: "5",
