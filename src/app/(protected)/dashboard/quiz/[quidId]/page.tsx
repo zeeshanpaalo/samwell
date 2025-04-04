@@ -8,7 +8,7 @@ const QuizResults = () => {
   const { result, fetchResultById } = useQuizContext();
 
   useEffect(() => {
-    if (quidId) {
+    if (quidId && !result) {
       fetchResultById(quidId as string);
     }
   }, [quidId]);
@@ -60,19 +60,19 @@ const QuizResults = () => {
               </svg>
             </div>
             <p className="text-3xl font-bold mt-4">{`${result?.quizScore}%`}</p>
-            <p className="text-sm text-green-600">Correct: 4</p>
-            <p className="text-sm text-orange-500">Incorrect: 6</p>
+            <p className="text-sm text-green-600">{`Correct: ${result?.correctAnswers}`}</p>
+            <p className="text-sm text-orange-500">{`Incorrect: ${result?.incorrectAnswers}`}</p>
           </div>
         </div>
 
         {/* Time Completed - Wider Card */}
         <div className="bg-white p-6 rounded-xl shadow-sm col-span-2 flex flex-col items-center">
           <h3 className="text-lg font-medium text-gray-700">Time Completed</h3>
-          <p className="text-3xl font-bold mt-4">00:18:54</p>
+          <p className="text-3xl font-bold mt-4">{`${result?.totalTimeTaken} sec`}</p>
           <h3 className="text-lg font-medium text-gray-700 mt-4">
             Avg. Time Per Question
           </h3>
-          <p className="text-xl font-semibold text-gray-900 mt-2">4 mins</p>
+          <p className="text-xl font-semibold text-gray-900 mt-2">{`${result?.averageTimePerQuestion}`}</p>
           <h3 className="text-lg font-medium text-gray-700 mt-4">
             Longest Time On A Question
           </h3>
