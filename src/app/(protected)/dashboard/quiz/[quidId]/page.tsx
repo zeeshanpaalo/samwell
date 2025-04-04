@@ -1,15 +1,16 @@
 "use client";
+import { useQuizContext } from "@/providers/QuizProvider";
 import React from "react";
 
 const QuizResults: React.FC = () => {
+  const { fetchAndSetQuestions, handleAnswerChange, onAnswerSubmit } =
+    useQuizContext();
   return (
     <div className="flex flex-col w-full px-[16px] py-[16px] min-h-screen">
       {/* Breadcrumb Navigation */}
       <div className="mb-4 flex space-x-2 text-sm text-gray-600">
         <span className="bg-gray-200 px-2 py-1 rounded-md">Dashboard</span>
-        <span className="bg-gray-200 px-2 py-1 rounded-md">
-          New Quiz
-        </span>
+        <span className="bg-gray-200 px-2 py-1 rounded-md">New Quiz</span>
         <span className="bg-blue-200 px-2 py-1 rounded-md">Quiz Results</span>
       </div>
       <h2 className="text-2xl font-semibold text-gray-900 mb-4">

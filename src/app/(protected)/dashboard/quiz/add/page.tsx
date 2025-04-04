@@ -1,54 +1,30 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import QuizQuestionsList, { AnyQuestion } from "@/components/quiz";
-import { fetchQuizData, submitAnswers } from "@/mocks/api";
+// import { fetchQuizData, submitAnswers } from "@/mocks/api";
+import { useQuizContext } from "@/providers/QuizProvider";
 
 const StartQuiz: React.FC = () => {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const studyInput = searchParams.get("studyInput");
-  const [answers, setAnswers] = useState<{
-    [key: string]: string[] | { [key: string]: string };
-  }>({});
-  const [questions, setQuestions] = useState<AnyQuestion[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Fetch questions on component mount
+  const {
+    fetchAndSetQuestions,
+    handleAnswerChange,
+    onAnswerSubmit,
+    questions,
+    isLoading,
+    handleSubmit,
+  } = useQuizContext();
+
   useEffect(() => {
-    fetchQuizData(studyInput!).then((data) => {
-      setQuestions(data);
-      setIsLoading(false);
-    });
-  }, []);
-
-  const handleAnswerChange = (
-    questionId: string,
-    selectedAnswers: string[]
-  ) => {
-    setAnswers((prev) => ({ ...prev, [questionId]: selectedAnswers }));
-  };
-
-  const onAnswerSubmit = (
-    questionId: string,
-    selectedAnswers: { [key: string]: string }
-  ) => {
-    setAnswers((prev) => ({ ...prev, [questionId]: selectedAnswers }));
-  };
-
-  const handleSubmit = () => {
-    submitAnswers(answers)
-      .then((result) => {
-        console.log("Quiz Result:", result);
-        router.push("/dashboard/quiz/1");
-      })
-      .catch((error) => {
-        console.error("Error submitting answers:", error);
-      });
-  };
-  console.log(answers);
+    if (studyInput) {
+      fetchAndSetQuestions(studyInput);
+    }
+  }, [studyInput]);
 
   return (
     <div className="flex flex-col w-full px-[16px] py-[16px] min-h-screen">
@@ -61,18 +37,17 @@ const StartQuiz: React.FC = () => {
         </div>
       </div>
 
-      {/* Loading state */}
+      {/* Loading */}
       {isLoading ? (
         <div className="flex justify-center items-center py-10">
           <div className="animate-spin border-t-4 border-blue-600 w-16 h-16 rounded-full"></div>
         </div>
       ) : (
-        // Question List
         <div className="px-[16px] py-[32px]">
           <QuizQuestionsList
+            questions={questions}
             onAnswerSubmit={onAnswerSubmit}
             handleAnswerChange={handleAnswerChange}
-            questions={questions}
           />
         </div>
       )}
