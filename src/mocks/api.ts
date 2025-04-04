@@ -92,7 +92,7 @@ export const submitAnswers = (answers: {
       };
 
       resolve(result);
-    }, 1000);
+    }, 500);
   });
 };
 
