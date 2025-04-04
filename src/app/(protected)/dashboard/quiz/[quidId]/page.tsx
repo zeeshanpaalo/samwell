@@ -3,8 +3,7 @@ import { useQuizContext } from "@/providers/QuizProvider";
 import React from "react";
 
 const QuizResults: React.FC = () => {
-  const { fetchAndSetQuestions, handleAnswerChange, onAnswerSubmit } =
-    useQuizContext();
+  const { result } = useQuizContext();
   return (
     <div className="flex flex-col w-full px-[16px] py-[16px] min-h-screen">
       {/* Breadcrumb Navigation */}
@@ -43,7 +42,7 @@ const QuizResults: React.FC = () => {
                 ></circle>
               </svg>
             </div>
-            <p className="text-3xl font-bold mt-4">40%</p>
+            <p className="text-3xl font-bold mt-4">{`${result?.quizScore}%`}</p>
             <p className="text-sm text-green-600">Correct: 4</p>
             <p className="text-sm text-orange-500">Incorrect: 6</p>
           </div>

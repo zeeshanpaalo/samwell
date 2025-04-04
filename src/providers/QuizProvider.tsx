@@ -3,7 +3,7 @@
 
 import React, { createContext, useContext, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { fetchQuizData, submitAnswers } from "@/mocks/api";
+import { QuizResults, fetchQuizData, submitAnswers } from "@/mocks/api";
 import { AnyQuestion } from "@/components/quiz";
 
 type AnswersMap = {
@@ -18,6 +18,8 @@ interface QuizContextType {
   isLoading: boolean;
 
   answers: AnswersMap;
+  result: QuizResults | null;
+
   handleAnswerChange: (questionId: string, selected: string[]) => void;
   onAnswerSubmit: (
     questionId: string,
@@ -38,6 +40,7 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({
   const [questions, setQuestions] = useState<AnyQuestion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [answers, setAnswers] = useState<AnswersMap>({});
+  const [result, setResult] = useState<QuizResults | null>(null);
 
   const fetchAndSetQuestions = useCallback(async (topic: string) => {
     setIsLoading(true);
@@ -63,8 +66,9 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const handleSubmit = useCallback(() => {
     submitAnswers(answers)
-      .then((result) => {
-        console.log("Quiz Result:", result);
+      .then((res: QuizResults) => {
+        setResult(res); // Store result for use elsewhere
+        console.log("Quiz Result:", res);
         router.push("/dashboard/quiz/1");
       })
       .catch((err) => console.error("Error submitting quiz:", err));
@@ -78,6 +82,7 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({
         questions,
         isLoading,
         answers,
+        result,
         fetchAndSetQuestions,
         handleAnswerChange,
         onAnswerSubmit,

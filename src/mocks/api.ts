@@ -55,7 +55,7 @@ export const fetchQuizData = async (
   });
 };
 
-type QuizResults = {
+export type QuizResults = {
   quizScore: number;
   correctAnswers: number;
   incorrectAnswers: number;
