@@ -61,9 +61,17 @@ type AnyQuestion =
 interface QuestionProps {
   question: AnyQuestion;
   handleAnswerChange: (questionId: string, selectedAnswers: string[]) => void;
+  onAnswerSubmit: (
+    questionId: string,
+    selectedAnswers: { [key: string]: string }
+  ) => void;
 }
 
 interface QuizQuestionsListProps {
+  onAnswerSubmit: (
+    questionId: string,
+    selectedAnswers: { [key: string]: string }
+  ) => void;
   handleAnswerChange: (questionId: string, selectedAnswers: string[]) => void;
   questions: AnyQuestion[];
 }
@@ -245,7 +253,10 @@ const DroppableArea: React.FC<{ id: string; selectedTerm?: string }> = ({
 
 const MatchingQuestionComp: React.FC<{
   question: MatchingQuestion;
-  onAnswerSubmit: (answers: { [key: string]: string }) => void;
+  onAnswerSubmit: (
+    questionId: string,
+    selectedAnswers: { [key: string]: string }
+  ) => void;
 }> = ({ question, onAnswerSubmit }) => {
   const [selectedAnswers, setSelectedAnswers] = useState<{
     [key: string]: string;
@@ -262,7 +273,8 @@ const MatchingQuestionComp: React.FC<{
 
       setSelectedAnswers(newAnswers);
       setOptions(options.filter((term) => term !== draggedItem));
-      onAnswerSubmit(newAnswers);
+      onAnswerSubmit(question.id, newAnswers);
+      console.log(newAnswers);
     }
   };
 
@@ -301,6 +313,7 @@ const MatchingQuestionComp: React.FC<{
 const QuestionRenderer: React.FC<QuestionProps> = ({
   question,
   handleAnswerChange,
+  onAnswerSubmit,
 }) => {
   if (question.type === QUESTION_TYPES.SINGLE_CHOICE) {
     return (
@@ -335,7 +348,7 @@ const QuestionRenderer: React.FC<QuestionProps> = ({
     return (
       <MatchingQuestionComp
         question={question as MatchingQuestion}
-        onAnswerSubmit={() => {}}
+        onAnswerSubmit={onAnswerSubmit}
       />
     );
   }
@@ -346,6 +359,7 @@ const QuestionRenderer: React.FC<QuestionProps> = ({
 const QuizQuestionsList: React.FC<QuizQuestionsListProps> = ({
   questions,
   handleAnswerChange,
+  onAnswerSubmit,
 }) => {
   return (
     <div className="space-y-6 px-[25px]">
@@ -354,6 +368,7 @@ const QuizQuestionsList: React.FC<QuizQuestionsListProps> = ({
           key={index}
           question={question}
           handleAnswerChange={handleAnswerChange}
+          onAnswerSubmit={onAnswerSubmit}
         />
       ))}
     </div>

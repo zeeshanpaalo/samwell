@@ -6,12 +6,24 @@ import QuizQuestionsList from "@/components/quiz";
 
 const StartQuiz: React.FC = () => {
   const router = useRouter();
-  const [answers, setAnswers] = useState<{ [key: string]: string[] }>({});
+  const [answers, setAnswers] = useState<{
+    [key: string]: string[] | { [key: string]: string };
+  }>({});
 
-  const handleAnswerChange = (questionId: string, selectedAnswers: string[]) => {
+  const handleAnswerChange = (
+    questionId: string,
+    selectedAnswers: string[]
+  ) => {
     setAnswers((prev) => ({ ...prev, [questionId]: selectedAnswers }));
   };
   console.log(answers);
+
+  const onAnswerSubmit = (
+    questionId: string,
+    selectedAnswers: { [key: string]: string }
+  ) => {
+    setAnswers((prev) => ({ ...prev, [questionId]: selectedAnswers }));
+  };
 
   const handleSubmit = () => {
     router.push("/dashboard/quiz/1");
@@ -30,6 +42,7 @@ const StartQuiz: React.FC = () => {
       {/* Question List */}
       <div className="px-[16px] py-[32px]">
         <QuizQuestionsList
+          onAnswerSubmit={onAnswerSubmit}
           handleAnswerChange={handleAnswerChange}
           questions={[
             {
@@ -62,7 +75,7 @@ const StartQuiz: React.FC = () => {
               id: "4",
               type: "MATCHING",
               text: "Click a definition to match it with a term.",
-              definitions: ["dsfsdf", "dsfdf", "dfd", "dfd"],
+              definitions: ["dsfsdf", "dsfdf", "dfd", "dfffd"],
               terms: ["COW", "FOX", "PIG", "DOG"],
             },
             {
