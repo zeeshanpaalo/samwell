@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import QuizQuestionsList, { AnyQuestion } from "@/components/quiz";
-import { fetchQuizData } from "@/mocks/api";
+import { fetchQuizData, submitAnswers } from "@/mocks/api";
 
 const StartQuiz: React.FC = () => {
   const router = useRouter();
@@ -39,7 +39,14 @@ const StartQuiz: React.FC = () => {
   };
 
   const handleSubmit = () => {
-    router.push("/dashboard/quiz/1");
+    submitAnswers(answers)
+      .then((result) => {
+        console.log("Quiz Result:", result);
+        router.push("/dashboard/quiz/1");
+      })
+      .catch((error) => {
+        console.error("Error submitting answers:", error);
+      });
   };
   console.log(answers);
 

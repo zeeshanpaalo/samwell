@@ -1,7 +1,9 @@
 import { AnyQuestion } from "@/components/quiz";
 
 // Mock function to simulate fetching quiz data from an API
-export const fetchQuizData = async (UserInput: string): Promise<AnyQuestion[]> => {
+export const fetchQuizData = async (
+  UserInput: string
+): Promise<AnyQuestion[]> => {
   // Simulate an API delay with a timeout
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -50,5 +52,45 @@ export const fetchQuizData = async (UserInput: string): Promise<AnyQuestion[]> =
         },
       ]);
     }, 1000); // Simulate network delay
+  });
+};
+
+type QuizResults = {
+  quizScore: number;
+  correctAnswers: number;
+  incorrectAnswers: number;
+  totalTimeTaken: number; // in seconds
+  averageTimePerQuestion: number; // in seconds
+};
+
+export const submitAnswers = (answers: {
+  [questionId: string]: string[] | { [key: string]: string };
+}): Promise<QuizResults> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const totalQuestions = Object.keys(answers).length;
+
+      // Simulate scoring
+      const correctAnswers = Math.floor(Math.random() * (totalQuestions + 1));
+      const incorrectAnswers = totalQuestions - correctAnswers;
+      const quizScore = Math.round((correctAnswers / totalQuestions) * 100);
+
+      // Simulate time taken
+      const totalTimeTaken = 72 + Math.floor(Math.random() * 300); // e.g., between 72s and 372s
+      const averageTimePerQuestion =
+        totalQuestions > 0 ? totalTimeTaken / totalQuestions : 0;
+
+      const result: QuizResults = {
+        quizScore,
+        correctAnswers,
+        incorrectAnswers,
+        totalTimeTaken,
+        averageTimePerQuestion: parseFloat(averageTimePerQuestion.toFixed(2)),
+      };
+
+      console.log("Mocked quiz result:", result);
+
+      resolve(result);
+    }, 1000);
   });
 };
