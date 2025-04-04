@@ -2,11 +2,14 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import QuizQuestionsList, { AnyQuestion } from "@/components/quiz";
 import { fetchQuizData } from "@/mocks/api";
 
 const StartQuiz: React.FC = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const studyInput = searchParams.get("studyInput");
   const [answers, setAnswers] = useState<{
     [key: string]: string[] | { [key: string]: string };
   }>({});
@@ -15,12 +18,10 @@ const StartQuiz: React.FC = () => {
 
   // Fetch questions on component mount
   useEffect(() => {
-    const loadData = async () => {
-      const data = await fetchQuizData();
+    fetchQuizData(studyInput!).then((data) => {
       setQuestions(data);
       setIsLoading(false);
-    };
-    loadData();
+    });
   }, []);
 
   const handleAnswerChange = (
@@ -40,7 +41,7 @@ const StartQuiz: React.FC = () => {
   const handleSubmit = () => {
     router.push("/dashboard/quiz/1");
   };
-  console.log(answers)
+  console.log(answers);
 
   return (
     <div className="flex flex-col w-full px-[16px] py-[16px] min-h-screen">

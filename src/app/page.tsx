@@ -1,13 +1,18 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function Home() {
   const router = useRouter();
+  const [studyInput, setStudyInput] = useState(""); // State for the text input
 
   const handleStartStudying = () => {
-    router.push("/dashboard/quiz/add");
+    router.push(
+      `/dashboard/quiz/add?studyInput=${encodeURIComponent(studyInput)}`
+    );
   };
+
   return (
     <div className="min-h-screen bg-white flex flex-col items-center px-6">
       {/* Navbar */}
@@ -65,16 +70,20 @@ export default function Home() {
               type="text"
               placeholder="Paste URL here"
               className="flex-1 p-2 border rounded-md"
+              // value={studyInput} // Bind the input value to state
+              // onChange={(e) => setStudyInput(e.target.value)} // Update state on change
             />
             <button className="px-4 py-2 bg-gray-200 rounded-md">Add</button>
           </div>
           <textarea
             placeholder="Type what you study..."
             className="w-full mt-4 p-2 border rounded-md"
+            value={studyInput} // Bind the input value to state
+            onChange={(e) => setStudyInput(e.target.value)} // Update state on change
           ></textarea>
           <button
             className="w-full mt-4 py-2 bg-blue-500 text-white rounded-md"
-            onClick={handleStartStudying}
+            onClick={handleStartStudying} // Trigger URL push with query
           >
             Start Studying
           </button>

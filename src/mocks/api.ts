@@ -1,7 +1,7 @@
 import { AnyQuestion } from "@/components/quiz";
 
 // Mock function to simulate fetching quiz data from an API
-export const fetchQuizData = async (): Promise<AnyQuestion[]> => {
+export const fetchQuizData = async (UserInput: string): Promise<AnyQuestion[]> => {
   // Simulate an API delay with a timeout
   return new Promise((resolve) => {
     setTimeout(() => {
