@@ -12,10 +12,10 @@ const QuizResults: React.FC = () => {
         <span className="bg-gray-200 px-2 py-1 rounded-md">New Quiz</span>
         <span className="bg-blue-200 px-2 py-1 rounded-md">Quiz Results</span>
       </div>
-      <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+      <h2 className="text-2xl font-semibold text-gray-900 mb-4 px-[20px]">
         Don’t worry, you’ll bounce back!
       </h2>
-      <div className="grid grid-cols-4 gap-6">
+      <div className="grid grid-cols-4 gap-6 px-[20px]">
         {/* Quiz Score */}
         <div className="bg-white p-6 rounded-xl shadow-sm col-span-1 flex flex-col items-center justify-center text-center">
           <h3 className="text-lg font-medium text-gray-700">Quiz Score</h3>

@@ -14,6 +14,9 @@ interface QuizContextType {
   topic: string;
   setTopic: (topic: string) => void;
 
+  quizId: string;
+  setQuizId: (quizId: string) => void;
+
   questions: AnyQuestion[];
   isLoading: boolean;
 
@@ -37,6 +40,7 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const router = useRouter();
   const [topic, setTopic] = useState("");
+  const [quizId, setQuizId] = useState("");
   const [questions, setQuestions] = useState<AnyQuestion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [answers, setAnswers] = useState<AnswersMap>({});
@@ -46,7 +50,8 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsLoading(true);
     setTopic(topic);
     const data = await fetchQuizData(topic);
-    setQuestions(data);
+    setQuestions(data.questions);
+    setQuizId(data.quizId)
     setIsLoading(false);
   }, []);
 
@@ -67,9 +72,8 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({
   const handleSubmit = useCallback(() => {
     submitAnswers(answers)
       .then((res: QuizResults) => {
-        setResult(res); // Store result for use elsewhere
-        console.log("Quiz Result:", res);
-        router.push("/dashboard/quiz/1");
+        setResult(res);
+        router.push(`/dashboard/quiz/${quizId}`);
       })
       .catch((err) => console.error("Error submitting quiz:", err));
   }, [answers, router]);
@@ -79,6 +83,8 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         topic,
         setTopic,
+        quizId,
+        setQuizId,
         questions,
         isLoading,
         answers,

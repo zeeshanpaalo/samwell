@@ -1,10 +1,12 @@
 "use client";
+import { useQuizContext } from "@/providers/QuizProvider";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function Layout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const { quizId, topic } = useQuizContext();
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
@@ -54,7 +56,7 @@ export default function Layout({
               height={35}
             />
             <div className="font-inter font-bold text-[20px] leading-[24px] tracking-[-1.5%] capitalize ml-[10px]">
-              Biology - Chapter 22: Evolution
+              {`${topic} : ${quizId}`}
             </div>
           </div>
           <div className="flex items-center space-x-4">

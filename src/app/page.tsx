@@ -1,16 +1,17 @@
 "use client";
 
+import { useQuizContext } from "@/providers/QuizProvider";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function Home() {
+  const { setTopic } = useQuizContext();
   const router = useRouter();
   const [studyInput, setStudyInput] = useState(""); // State for the text input
 
   const handleStartStudying = () => {
-    router.push(
-      `/dashboard/quiz/add?studyInput=${encodeURIComponent(studyInput)}`
-    );
+    setTopic(studyInput);
+    router.push(`/dashboard/quiz/add`);
   };
 
   return (

@@ -1,15 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-// import { useRouter } from "next/navigation";
-import { useSearchParams } from "next/navigation";
-import QuizQuestionsList, { AnyQuestion } from "@/components/quiz";
-// import { fetchQuizData, submitAnswers } from "@/mocks/api";
+import React, { useEffect } from "react";
+import QuizQuestionsList from "@/components/quiz";
 import { useQuizContext } from "@/providers/QuizProvider";
 
 const StartQuiz: React.FC = () => {
-  const searchParams = useSearchParams();
-  const studyInput = searchParams.get("studyInput");
 
   const {
     fetchAndSetQuestions,
@@ -18,13 +13,14 @@ const StartQuiz: React.FC = () => {
     questions,
     isLoading,
     handleSubmit,
+    topic
   } = useQuizContext();
 
   useEffect(() => {
-    if (studyInput) {
-      fetchAndSetQuestions(studyInput);
+    if (topic) {
+      fetchAndSetQuestions(topic);
     }
-  }, [studyInput]);
+  }, [topic]);
 
   return (
     <div className="flex flex-col w-full px-[16px] py-[16px] min-h-screen">
