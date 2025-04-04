@@ -51,7 +51,7 @@ interface ShortAnswerQuestion extends Question {
 }
 
 // Union type to represent all possible questions
-type AnyQuestion =
+export type AnyQuestion =
   | SingleChoiceQuestion
   | MultipleChoiceQuestion
   | MatchingQuestion

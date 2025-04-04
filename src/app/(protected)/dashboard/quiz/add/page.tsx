@@ -1,14 +1,27 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import QuizQuestionsList from "@/components/quiz";
+import QuizQuestionsList, { AnyQuestion } from "@/components/quiz";
+import { fetchQuizData } from "@/mocks/api";
 
 const StartQuiz: React.FC = () => {
   const router = useRouter();
   const [answers, setAnswers] = useState<{
     [key: string]: string[] | { [key: string]: string };
   }>({});
+  const [questions, setQuestions] = useState<AnyQuestion[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // Fetch questions on component mount
+  useEffect(() => {
+    const loadData = async () => {
+      const data = await fetchQuizData();
+      setQuestions(data);
+      setIsLoading(false);
+    };
+    loadData();
+  }, []);
 
   const handleAnswerChange = (
     questionId: string,
@@ -16,7 +29,6 @@ const StartQuiz: React.FC = () => {
   ) => {
     setAnswers((prev) => ({ ...prev, [questionId]: selectedAnswers }));
   };
-  console.log(answers);
 
   const onAnswerSubmit = (
     questionId: string,
@@ -28,6 +40,8 @@ const StartQuiz: React.FC = () => {
   const handleSubmit = () => {
     router.push("/dashboard/quiz/1");
   };
+  console.log(answers)
+
   return (
     <div className="flex flex-col w-full px-[16px] py-[16px] min-h-screen">
       <div className="flex justify-between items-center">
@@ -39,72 +53,33 @@ const StartQuiz: React.FC = () => {
         </div>
       </div>
 
-      {/* Question List */}
-      <div className="px-[16px] py-[32px]">
-        <QuizQuestionsList
-          onAnswerSubmit={onAnswerSubmit}
-          handleAnswerChange={handleAnswerChange}
-          questions={[
-            {
-              id: "1",
-              type: "SINGLE_CHOICE",
-              text: "What is the powerhouse of the cell?",
-              options: [
-                "Nucleus",
-                "Ribosome",
-                "Mitochondria",
-                "Golgi Apparatus",
-              ],
-              // correctAnswer: ""
-            },
-            {
-              id: "2",
-              type: "MULTIPLE_ANSWER",
-              text: "Which of the following are primary colors? (Select all that apply.)",
-              options: ["Red", "Blue", "Yellow", "Green"],
-              // pairs: [],
-            },
-            {
-              id: "3",
-              type: "SINGLE_CHOICE",
-              text: "The Great Wall of China is visible from space.",
-              options: ["True", "False"],
-              // pairs: [],
-            },
-            {
-              id: "4",
-              type: "MATCHING",
-              text: "Click a definition to match it with a term.",
-              definitions: ["Process by which plants make their food.", "Type of cellular division.", "Movement of water across a membrane.", "Protein that speeds up chemical reactions."],
-              terms: ["Photosynthesis", "Mitosis", "Osmosis", "Enzyme"],
-            },
-            {
-              id: "5",
-              type: "FILL_BLANK",
-              text: "The main energy source for cells is  which moves through semi-permeable membranes by the process of ____________ and enzymes act as biological ____________ to speed up chemical reactions.",
-              options: ["COW", "FOX", "PIG", "DOG"],
-              // pairs: [],
-            },
-            {
-              id: "6",
-              type: "TEXT_RESPONSE",
-              text: "Whats your thought on String theory?",
-              options: [],
-              // pairs: [],
-            },
-          ]}
-        />
-      </div>
+      {/* Loading state */}
+      {isLoading ? (
+        <div className="flex justify-center items-center py-10">
+          <div className="animate-spin border-t-4 border-blue-600 w-16 h-16 rounded-full"></div>
+        </div>
+      ) : (
+        // Question List
+        <div className="px-[16px] py-[32px]">
+          <QuizQuestionsList
+            onAnswerSubmit={onAnswerSubmit}
+            handleAnswerChange={handleAnswerChange}
+            questions={questions}
+          />
+        </div>
+      )}
 
       {/* Submit Button */}
-      <div className="flex justify-end px-[16px] py-4">
-        <button
-          className="bg-[#2A76F6] text-white px-6 py-2 rounded-[59px] shadow hover:bg-blue-700 w-[174px] h-[50px]"
-          onClick={handleSubmit}
-        >
-          Complete
-        </button>
-      </div>
+      {!isLoading && (
+        <div className="flex justify-end px-[16px] py-4">
+          <button
+            className="bg-[#2A76F6] text-white px-6 py-2 rounded-[59px] shadow hover:bg-blue-700 w-[174px] h-[50px]"
+            onClick={handleSubmit}
+          >
+            Complete
+          </button>
+        </div>
+      )}
     </div>
   );
 };
