@@ -96,7 +96,10 @@ const QuestionRenderer: React.FC<QuestionProps> = ({
   }
   if (question.type === QUESTION_TYPES.FILL_BLANK) {
     return (
-      <FillBlankQuestionComp question={question as FillInTheBlankQuestion} />
+      <FillBlankQuestionComp
+        question={question as FillInTheBlankQuestion}
+        handleAnswerChange={handleAnswerChange}
+      />
     );
   }
   if (question.type === QUESTION_TYPES.TEXT_RESPONSE) {

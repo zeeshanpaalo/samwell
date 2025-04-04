@@ -6,12 +6,7 @@ import {
   useDraggable,
   useDroppable,
 } from "@dnd-kit/core";
-
-export type FillInTheBlankQuestion = {
-  text: string;
-  options: string[];
-  blanks: number;
-};
+import { FillInTheBlankQuestion } from ".";
 
 const DraggableItem: React.FC<{
   id: string;
@@ -58,12 +53,13 @@ const DroppableArea: React.FC<{
 
 export const FillBlankQuestionComp: React.FC<{
   question: FillInTheBlankQuestion;
-}> = ({ question }) => {
+  handleAnswerChange: (questionId: string, selectedAnswers: string[]) => void;
+}> = ({ question, handleAnswerChange }) => {
   const [availableOptions, setAvailableOptions] = useState<string[]>(
     question.options
   );
-  const [blanks, setBlanks] = useState<(string | null)[]>(
-    Array(question.blanks).fill(null)
+  const [blanks, setBlanks] = useState<(string)[]>(
+    Array(question.blanks).fill("")
   );
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -74,7 +70,12 @@ export const FillBlankQuestionComp: React.FC<{
     const overId = over.id.toString();
 
     if (overId.startsWith("blank-")) {
+      // TODO handleAnswerChange
       const index = parseInt(overId.split("-")[1], 10);
+      const oldItems = [...blanks];
+      oldItems[index] = draggedId;
+
+      handleAnswerChange(question.id, oldItems);
       setBlanks((prev) => {
         const oldValue = prev[index];
         const newBlanks = [...prev];
@@ -95,7 +96,7 @@ export const FillBlankQuestionComp: React.FC<{
       setAvailableOptions((prev) =>
         prev.includes(draggedId) ? prev : [...prev, draggedId]
       );
-      setBlanks((prev) => prev.map((val) => (val === draggedId ? null : val)));
+      setBlanks((prev) => prev.map((val) => (val === draggedId ? "" : val)));
     }
   };
 
@@ -103,7 +104,7 @@ export const FillBlankQuestionComp: React.FC<{
     const index = parseInt(blankId.split("-")[1], 10);
     setBlanks((prev) => {
       const newBlanks = [...prev];
-      newBlanks[index] = null;
+      newBlanks[index] = "";
       return newBlanks;
     });
     setAvailableOptions((prev) => [...prev, value!]);

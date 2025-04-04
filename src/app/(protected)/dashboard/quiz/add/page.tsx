@@ -5,7 +5,6 @@ import QuizQuestionsList from "@/components/quiz";
 import { useQuizContext } from "@/providers/QuizProvider";
 
 const StartQuiz: React.FC = () => {
-
   const {
     fetchAndSetQuestions,
     handleAnswerChange,
@@ -13,7 +12,8 @@ const StartQuiz: React.FC = () => {
     questions,
     isLoading,
     handleSubmit,
-    topic
+    topic,
+    answers,
   } = useQuizContext();
 
   useEffect(() => {
@@ -21,7 +21,6 @@ const StartQuiz: React.FC = () => {
       fetchAndSetQuestions(topic);
     }
   }, [topic]);
-
   return (
     <div className="flex flex-col w-full px-[16px] py-[16px] min-h-screen">
       <div className="flex justify-between items-center">
