@@ -1,11 +1,18 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import QuizQuestionsList from "@/components/quiz";
 
 const StartQuiz: React.FC = () => {
   const router = useRouter();
+  const [answers, setAnswers] = useState<{ [key: string]: string[] }>({});
+
+  const handleAnswerChange = (questionId: string, selectedAnswers: string[]) => {
+    setAnswers((prev) => ({ ...prev, [questionId]: selectedAnswers }));
+  };
+  console.log(answers);
+
   const handleSubmit = () => {
     router.push("/dashboard/quiz/1");
   };
@@ -23,8 +30,10 @@ const StartQuiz: React.FC = () => {
       {/* Question List */}
       <div className="px-[16px] py-[32px]">
         <QuizQuestionsList
+          handleAnswerChange={handleAnswerChange}
           questions={[
             {
+              id: "1",
               type: "SINGLE_CHOICE",
               text: "What is the powerhouse of the cell?",
               options: [
@@ -36,36 +45,40 @@ const StartQuiz: React.FC = () => {
               // correctAnswer: ""
             },
             {
+              id: "2",
               type: "MULTIPLE_ANSWER",
               text: "Which of the following are primary colors? (Select all that apply.)",
               options: ["Red", "Blue", "Yellow", "Green"],
               // pairs: [],
             },
             {
+              id: "3",
               type: "SINGLE_CHOICE",
               text: "The Great Wall of China is visible from space.",
               options: ["True", "False"],
               // pairs: [],
             },
             {
+              id: "4",
               type: "MATCHING",
               text: "Click a definition to match it with a term.",
               definitions: ["dsfsdf", "dsfdf", "dfd", "dfd"],
               terms: ["COW", "FOX", "PIG", "DOG"],
             },
             {
+              id: "5",
               type: "FILL_BLANK",
               text: "The main energy source for cells is  which moves through semi-permeable membranes by the process of ____________ and enzymes act as biological ____________ to speed up chemical reactions.",
               options: ["COW", "FOX", "PIG", "DOG"],
               // pairs: [],
             },
             {
+              id: "6",
               type: "TEXT_RESPONSE",
               text: "Whats your thought on String theory?",
               options: [],
               // pairs: [],
             },
-           
           ]}
         />
       </div>

@@ -15,6 +15,7 @@ const QUESTION_TYPES = {
 };
 
 type Question = {
+  id: string;
   type: string;
   text: string;
 };
@@ -59,16 +60,24 @@ type AnyQuestion =
 
 interface QuestionProps {
   question: AnyQuestion;
+  handleAnswerChange: (questionId: string, selectedAnswers: string[]) => void;
 }
 
 interface QuizQuestionsListProps {
+  handleAnswerChange: (questionId: string, selectedAnswers: string[]) => void;
   questions: AnyQuestion[];
 }
 
 const SingleChoiceQuestionComp: React.FC<{
   question: SingleChoiceQuestion;
-}> = ({ question }) => {
+  handleAnswerChange: (questionId: string, selectedAnswers: string[]) => void;
+}> = ({ question, handleAnswerChange }) => {
   const [selected, setSelected] = useState<number | null>(null);
+
+  const handleAnswer = (index: number, value: string) => {
+    setSelected(index);
+    handleAnswerChange(question.id, [`${value}`]);
+  };
 
   return (
     <div className="p-6 rounded-lg bg-white shadow-sm w-full max-w-xxl">
@@ -89,7 +98,7 @@ const SingleChoiceQuestionComp: React.FC<{
               name="question"
               value={index}
               checked={selected === index}
-              onChange={() => setSelected(index)}
+              onChange={() => handleAnswer(index, option)}
               className="hidden"
             />
             <span
@@ -114,22 +123,47 @@ const SingleChoiceQuestionComp: React.FC<{
 
 const MultipleAnswerQuestionComp: React.FC<{
   question: MultipleChoiceQuestion;
-}> = ({ question }) => (
-  <div className="p-6 rounded-lg bg-white shadow-sm">
-    <p className="font-semibold text-lg">{question.text}</p>
-    <div className="grid grid-cols-2 gap-4 mt-4">
-      {question.options.map((option, index) => (
-        <label
-          key={index}
-          className="p-4 border rounded-lg text-left flex items-center cursor-pointer"
-        >
-          <input type="checkbox" className="mr-2" />
-          {option}
-        </label>
-      ))}
+  handleAnswerChange: (questionId: string, selectedAnswers: string[]) => void;
+}> = ({ question, handleAnswerChange }) => {
+  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+
+  const handleSelection = (option: string) => {
+    setSelectedOptions((prev) => {
+      const newSelection = prev.includes(option)
+        ? prev.filter((item) => item !== option) // Remove if already selected
+        : [...prev, option]; // Add if not selected
+
+      // Call the function received from props
+      handleAnswerChange(question.id, newSelection);
+      return newSelection;
+    });
+  };
+
+  return (
+    <div className="p-6 rounded-lg bg-white shadow-sm">
+      <p className="font-semibold text-lg">{question.text}</p>
+      <div className="grid grid-cols-2 gap-4 mt-4">
+        {question.options.map((option, index) => (
+          <label
+            key={index}
+            className="p-4 border rounded-lg text-left flex items-center cursor-pointer"
+          >
+            <input
+              type="checkbox"
+              className="mr-2"
+              checked={selectedOptions.includes(option)}
+              onChange={() => handleSelection(option)}
+            />
+            {option}
+          </label>
+        ))}
+      </div>
+      <p className="text-blue-600 text-sm text-center mt-4 cursor-pointer">
+        Don’t know?
+      </p>
     </div>
-  </div>
-);
+  );
+};
 
 const FillBlankQuestionComp: React.FC<{ question: FillInTheBlankQuestion }> = ({
   question,
@@ -150,18 +184,25 @@ const FillBlankQuestionComp: React.FC<{ question: FillInTheBlankQuestion }> = ({
   </div>
 );
 
-const TextResponseQuestionComp: React.FC<{ question: ShortAnswerQuestion }> = ({
-  question,
-}) => (
-  <div className="p-6 rounded-lg bg-white shadow-sm">
-    <p className="font-semibold text-lg">{question.text}</p>
-    <textarea
-      className="w-full px-4 py-3 mt-4 border rounded-lg"
-      rows={1}
-      placeholder="Type your response..."
-    ></textarea>
-  </div>
-);
+const TextResponseQuestionComp: React.FC<{
+  question: ShortAnswerQuestion;
+  handleAnswerChange: (questionId: string, selectedAnswers: string[]) => void;
+}> = ({ question, handleAnswerChange }) => {
+  const handleAnswer = (value: string) => {
+    handleAnswerChange(question.id, [`${value}`]);
+  };
+  return (
+    <div className="p-6 rounded-lg bg-white shadow-sm">
+      <p className="font-semibold text-lg">{question.text}</p>
+      <textarea
+        className="w-full px-4 py-3 mt-4 border rounded-lg"
+        rows={1}
+        placeholder="Type your response..."
+        onChange={(e) => handleAnswer(e.target.value)}
+      ></textarea>
+    </div>
+  );
+};
 
 const DraggableTerm: React.FC<{ id: string; children: React.ReactNode }> = ({
   id,
@@ -257,16 +298,23 @@ const MatchingQuestionComp: React.FC<{
   );
 };
 
-const QuestionRenderer: React.FC<QuestionProps> = ({ question }) => {
+const QuestionRenderer: React.FC<QuestionProps> = ({
+  question,
+  handleAnswerChange,
+}) => {
   if (question.type === QUESTION_TYPES.SINGLE_CHOICE) {
     return (
-      <SingleChoiceQuestionComp question={question as SingleChoiceQuestion} />
+      <SingleChoiceQuestionComp
+        question={question as SingleChoiceQuestion}
+        handleAnswerChange={handleAnswerChange}
+      />
     );
   }
   if (question.type === QUESTION_TYPES.MULTIPLE_ANSWER) {
     return (
       <MultipleAnswerQuestionComp
         question={question as MultipleChoiceQuestion}
+        handleAnswerChange={handleAnswerChange}
       />
     );
   }
@@ -277,7 +325,10 @@ const QuestionRenderer: React.FC<QuestionProps> = ({ question }) => {
   }
   if (question.type === QUESTION_TYPES.TEXT_RESPONSE) {
     return (
-      <TextResponseQuestionComp question={question as ShortAnswerQuestion} />
+      <TextResponseQuestionComp
+        question={question as ShortAnswerQuestion}
+        handleAnswerChange={handleAnswerChange}
+      />
     );
   }
   if (question.type === QUESTION_TYPES.MATCHING) {
@@ -292,11 +343,18 @@ const QuestionRenderer: React.FC<QuestionProps> = ({ question }) => {
   return <div>Unsupported question type</div>;
 };
 
-const QuizQuestionsList: React.FC<QuizQuestionsListProps> = ({ questions }) => {
+const QuizQuestionsList: React.FC<QuizQuestionsListProps> = ({
+  questions,
+  handleAnswerChange,
+}) => {
   return (
     <div className="space-y-6 px-[25px]">
       {questions.map((question, index) => (
-        <QuestionRenderer key={index} question={question} />
+        <QuestionRenderer
+          key={index}
+          question={question}
+          handleAnswerChange={handleAnswerChange}
+        />
       ))}
     </div>
   );
