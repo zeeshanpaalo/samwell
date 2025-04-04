@@ -6,6 +6,7 @@ import {
 } from "@dnd-kit/core";
 import { MatchingQuestion } from ".";
 import { useState } from "react";
+import Image from "next/image";
 
 const DraggableTerm: React.FC<{ id: string; children: React.ReactNode }> = ({
   id,
@@ -109,7 +110,15 @@ export const MatchingQuestionComp: React.FC<{
             .filter((term) => !Object.values(selectedAnswers).includes(term))
             .map((term) => (
               <DraggableTerm key={term} id={term}>
-                {term}
+                <div className="flex items-center">
+                  <Image
+                    src={"/assets/dragIcon.svg"}
+                    alt={`Logo`}
+                    width={10}
+                    height={15}
+                  />
+                  <div className="ml-[15px]">{term}</div>
+                </div>
               </DraggableTerm>
             ))}
         </div>

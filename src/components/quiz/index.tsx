@@ -39,7 +39,7 @@ export interface MatchingQuestion extends Question {
 // Fill in the blank question type
 export interface FillInTheBlankQuestion extends Question {
   options: string[];
-  blanks: string[];
+  blanks: number;
 }
 
 // Short answer question type

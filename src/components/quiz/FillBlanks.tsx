@@ -1,19 +1,28 @@
 import React, { useState } from "react";
+import Image from "next/image";
 import {
   DndContext,
   DragEndEvent,
   useDraggable,
   useDroppable,
 } from "@dnd-kit/core";
-import { FillInTheBlankQuestion } from ".";
+
+export type FillInTheBlankQuestion = {
+  text: string;
+  options: string[];
+  blanks: number; // Number of blanks in the question
+};
+
 const DraggableItem: React.FC<{ id: string; children: React.ReactNode }> = ({
   id,
   children,
 }) => {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({ id });
-  const style = transform
-    ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` }
-    : {};
+  const style = {
+    transform: transform
+      ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
+      : "none",
+  };
 
   return (
     <div
@@ -21,22 +30,25 @@ const DraggableItem: React.FC<{ id: string; children: React.ReactNode }> = ({
       {...listeners}
       {...attributes}
       style={style}
-      className="px-4 py-2 bg-blue-500 text-white rounded-md cursor-pointer"
+      className="px-4 py-2 border rounded-md cursor-pointer shadow-md"
     >
       {children}
     </div>
   );
 };
-const DroppableArea: React.FC<{ id: string; children?: string }> = ({
-  id,
-  children,
-}) => {
+
+const DroppableArea: React.FC<{
+  id: string;
+  onDrop: (id: string) => void;
+  children?: string;
+}> = ({ id, onDrop, children }) => {
   const { setNodeRef } = useDroppable({ id });
 
   return (
     <span
       ref={setNodeRef}
-      className="inline-block min-w-[50px] h-6 border-b-2 border-dashed border-gray-400 align-middle"
+      onClick={() => children && onDrop(children)} // Allow clicking to remove
+      className="inline-block min-w-[80px] px-2 h-8 border-b-2 border-dashed border-gray-500 text-center align-middle bg-gray-100 cursor-pointer"
     >
       {children || "____"}
     </span>
@@ -46,52 +58,74 @@ const DroppableArea: React.FC<{ id: string; children?: string }> = ({
 export const FillBlankQuestionComp: React.FC<{
   question: FillInTheBlankQuestion;
 }> = ({ question }) => {
-  const [answers, setAnswers] = useState(question.options);
-  const [blanks, setBlanks] = useState(
-    Array(question.blanks.length).fill(null)
-  );
+  const [availableOptions, setAvailableOptions] = useState(question.options);
+  const [blanks, setBlanks] = useState(Array(question.blanks).fill(null));
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over) return;
 
     const draggedItem = active.id;
-    // const dropIndex = parseInt(over.id.replace("blank-", ""));
-    const dropIndex = parseInt(`${over.id}`);
+    const overId = over.id.toString();
 
-    if (!isNaN(dropIndex)) {
-      const newBlanks = [...blanks];
-      newBlanks[dropIndex] = draggedItem;
-      setBlanks(newBlanks);
-      setAnswers((prev) => prev.filter((item) => item !== draggedItem));
+    if (overId.startsWith("blank-")) {
+      const dropIndex = parseInt(overId.replace("blank-", ""), 10);
+      if (!isNaN(dropIndex) && !blanks[dropIndex]) {
+        const newBlanks = [...blanks];
+        newBlanks[dropIndex] = draggedItem;
+        setBlanks(newBlanks);
+        setAvailableOptions((prev) =>
+          prev.filter((item) => item !== draggedItem)
+        );
+      }
+    } else if (overId === "options-container") {
+      // Dragging back to options
+      setAvailableOptions((prev) => [...prev, `${draggedItem}`]);
+      setBlanks((prev) => prev.map((b) => (b === draggedItem ? null : b)));
     }
+  };
+
+  const handleRemoveFromBlank = (id: string) => {
+    setAvailableOptions((prev) => [...prev, id]);
+    setBlanks((prev) => prev.map((b) => (b === id ? null : b)));
   };
 
   const renderedText = question.text.split("{BLANK}").map((part, index) => (
     <React.Fragment key={index}>
       {part}
       {index < blanks.length && (
-        <DroppableArea id={`blank-${index}`}>
-          {blanks[index] && (
-            <DraggableItem id={blanks[index]}>{blanks[index]}</DraggableItem>
-          )}
+        <DroppableArea id={`blank-${index}`} onDrop={handleRemoveFromBlank}>
+          {blanks[index]}
         </DroppableArea>
       )}
     </React.Fragment>
   ));
 
   return (
-    <DndContext onDragEnd={handleDragEnd}>
-      <div className="p-6 bg-white rounded-lg shadow-md w-full max-w-2xl">
-        <p className="font-semibold text-lg mb-4">{renderedText}</p>
-        <div className="flex flex-wrap gap-2">
-          {answers.map((word) => (
-            <DraggableItem key={word} id={word}>
-              {word}
-            </DraggableItem>
-          ))}
+    <div className="p-6 rounded-lg bg-white shadow-sm">
+      <DndContext onDragEnd={handleDragEnd}>
+        <div className="w-full mx-auto">
+          <p className="font-semibold text-lg mb-4">{renderedText}</p>
+          <div
+            id="options-container"
+            className="flex flex-wrap gap-3 p-3 rounded-lg"
+          >
+            {availableOptions.map((word) => (
+              <DraggableItem key={word} id={word}>
+                <div className="flex items-center">
+                  <Image
+                    src={"/assets/dragIcon.svg"}
+                    alt={`Logo`}
+                    width={10}
+                    height={15}
+                  />
+                  <div className="ml-[15px]">{word}</div>
+                </div>
+              </DraggableItem>
+            ))}
+          </div>
         </div>
-      </div>
-    </DndContext>
+      </DndContext>
+    </div>
   );
 };

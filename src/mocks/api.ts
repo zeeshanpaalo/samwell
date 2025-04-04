@@ -45,7 +45,7 @@ export const fetchQuizData = async (
             type: "FILL_BLANK",
             text: "The main energy source for cells is which moves through semi-permeable membranes by the process of {BLANK} and enzymes act as biological {BLANK} to speed up chemical reactions.",
             options: ["ATP", "Osmosis", "Mitosis", "Catalyst"],
-            blanks: ["", ""],
+            blanks: 2,
           },
           {
             id: "6",
