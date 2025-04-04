@@ -1,9 +1,26 @@
 "use client";
 import { useQuizContext } from "@/providers/QuizProvider";
-import React from "react";
+import { useParams } from "next/navigation";
+import React, { useEffect } from "react";
 
-const QuizResults: React.FC = () => {
-  const { result } = useQuizContext();
+const QuizResults = () => {
+  const { quidId } = useParams();
+  const { result, fetchResultById } = useQuizContext();
+
+  useEffect(() => {
+    if (quidId) {
+      fetchResultById(quidId as string);
+    }
+  }, [quidId]);
+
+  if (!result) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin border-t-4 border-blue-600 w-16 h-16 rounded-full"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col w-full px-[16px] py-[16px] min-h-screen">
       {/* Breadcrumb Navigation */}

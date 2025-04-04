@@ -3,7 +3,12 @@
 
 import React, { createContext, useContext, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { QuizResults, fetchQuizData, submitAnswers } from "@/mocks/api";
+import {
+  QuizResults,
+  fetchQuizData,
+  fetchQuizResultById,
+  submitAnswers,
+} from "@/mocks/api";
 import { AnyQuestion } from "@/components/quiz";
 
 type AnswersMap = {
@@ -22,6 +27,7 @@ interface QuizContextType {
 
   answers: AnswersMap;
   result: QuizResults | null;
+  fetchResultById: (id: string) => Promise<void>;
 
   handleAnswerChange: (questionId: string, selected: string[]) => void;
   onAnswerSubmit: (
@@ -51,7 +57,7 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({
     setTopic(topic);
     const data = await fetchQuizData(topic);
     setQuestions(data.questions);
-    setQuizId(data.quizId)
+    setQuizId(data.quizId);
     setIsLoading(false);
   }, []);
 
@@ -78,6 +84,11 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({
       .catch((err) => console.error("Error submitting quiz:", err));
   }, [answers, router]);
 
+  const fetchResultById = useCallback(async (id: string) => {
+    const data = await fetchQuizResultById(id);
+    setResult(data);
+  }, []);
+
   return (
     <QuizContext.Provider
       value={{
@@ -89,6 +100,7 @@ export const QuizProvider: React.FC<{ children: React.ReactNode }> = ({
         isLoading,
         answers,
         result,
+        fetchResultById,
         fetchAndSetQuestions,
         handleAnswerChange,
         onAnswerSubmit,

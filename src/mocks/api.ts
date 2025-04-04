@@ -95,3 +95,14 @@ export const submitAnswers = (answers: {
     }, 1000);
   });
 };
+
+export const fetchQuizResultById = async (id: string): Promise<QuizResults> => {
+  await new Promise((res) => setTimeout(res, 500)); // simulate delay
+  return {
+    quizScore: 40,
+    correctAnswers: 4,
+    incorrectAnswers: 6,
+    totalTimeTaken: 1134,
+    averageTimePerQuestion: 240,
+  };
+};
